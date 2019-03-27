@@ -155,7 +155,7 @@ public class RNReactNativeGetMusicFilesModule extends ReactContextBaseJavaModule
             if (musicCursor.getCount() > 0) {
                 WritableArray jsonArray = new WritableNativeArray();
                 WritableMap items;
-
+                int cpt = 0;
 
                 //FFmpegMediaMetadataRetriever mmr = new FFmpegMediaMetadataRetriever();
                 MediaMetadataRetriever mmr = new MediaMetadataRetriever();
@@ -272,6 +272,7 @@ public class RNReactNativeGetMusicFilesModule extends ReactContextBaseJavaModule
 
 
                                 jsonArray.pushMap(items);
+                                cpt++;
 
                                 if (songsPerIteration > 0) {
 
@@ -282,11 +283,12 @@ public class RNReactNativeGetMusicFilesModule extends ReactContextBaseJavaModule
                                             sendEvent(reactContext, "onBatchReceived", params);
                                         }
                                     } else {
-                                        if (songsPerIteration == jsonArray.size()) {
+                                        if (songsPerIteration == cpt) {
                                             WritableMap params = Arguments.createMap();
                                             params.putArray("batch", jsonArray);
                                             sendEvent(reactContext, "onBatchReceived", params);
                                             jsonArray = new WritableNativeArray();
+                                            cpt = 0;
                                         } else if (pointer == (musicCursor.getCount() - 1)) {
                                             WritableMap params = Arguments.createMap();
                                             params.putArray("batch", jsonArray);

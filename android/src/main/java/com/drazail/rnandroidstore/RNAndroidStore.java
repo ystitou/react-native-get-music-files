@@ -284,6 +284,7 @@ public class RNAndroidStore extends ReactContextBaseJavaModule {
                             item.putString("duration", String.valueOf(tempcursor.getString(3)));
                             item.putString("path", String.valueOf(tempcursor.getString(4)));
                             item.putString("id", String.valueOf(tempcursor.getString(5)));
+                            getCoverByPath(getBluredImages, coversFolder, coversResizeRatio, getIcons, iconsSize, coversSize, item.getString("path"), Long.parseLong(item.getString("id")), item);
                             jsonArray.pushMap(item);
                         } while (tempcursor.moveToNext());
                     }
@@ -297,7 +298,7 @@ public class RNAndroidStore extends ReactContextBaseJavaModule {
             genrecursor.close();
             successCallback.invoke(jsonArray);
         } else {
-            String[] projection = new String[] { MediaStore.Audio.Genres.NAME };
+            String[] projection = new String[] { MediaStore.Audio.Genres.NAME, MediaStore.Audio.Genres._ID };
             Cursor cursor = getCurrentActivity().getContentResolver()
                     .query(MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI, projection, null, null, null);
             if (cursor != null && cursor.getCount() > 0) {
@@ -305,6 +306,7 @@ public class RNAndroidStore extends ReactContextBaseJavaModule {
                 do {
                     WritableMap item = new WritableNativeMap();
                     item.putString("name", String.valueOf(cursor.getString(0)));
+                    item.putString("id", String.valueOf(cursor.getString(1)));
                     jsonArray.pushMap(item);
                 } while (cursor.moveToNext());
             } else {
@@ -377,6 +379,7 @@ public class RNAndroidStore extends ReactContextBaseJavaModule {
                     item.putString("duration", String.valueOf(cursor.getString(3)));
                     item.putString("path", String.valueOf(cursor.getString(4)));
                     item.putString("id", String.valueOf(cursor.getString(5)));
+                    getCoverByPath(getBluredImages, coversFolder, coversResizeRatio, getIcons, iconsSize, coversSize, item.getString("path"), Long.parseLong(item.getString("id")), item);
                     jsonArray.pushMap(item);
                 } while (cursor.moveToNext());
             } else {
@@ -406,6 +409,7 @@ public class RNAndroidStore extends ReactContextBaseJavaModule {
                     item.putString("duration", String.valueOf(cursor.getString(3)));
                     item.putString("path", String.valueOf(cursor.getString(4)));
                     item.putString("id", String.valueOf(cursor.getString(5)));
+                    getCoverByPath(getBluredImages, coversFolder, coversResizeRatio, getIcons, iconsSize, coversSize, item.getString("path"), Long.parseLong(item.getString("id")), item);
                     jsonArray.pushMap(item);
                 } while (cursor.moveToNext());
             } else {
@@ -434,6 +438,7 @@ public class RNAndroidStore extends ReactContextBaseJavaModule {
                     item.putString("duration", String.valueOf(cursor.getString(3)));
                     item.putString("path", String.valueOf(cursor.getString(4)));
                     item.putString("id", String.valueOf(cursor.getString(5)));
+                    getCoverByPath(getBluredImages, coversFolder, coversResizeRatio, getIcons, iconsSize, coversSize, item.getString("path"), Long.parseLong(item.getString("id")), item);
                     jsonArray.pushMap(item);
                 } while (cursor.moveToNext());
             } else {
@@ -464,6 +469,7 @@ public class RNAndroidStore extends ReactContextBaseJavaModule {
                     item.putString("duration", String.valueOf(cursor.getString(3)));
                     item.putString("path", String.valueOf(cursor.getString(4)));
                     item.putString("id", String.valueOf(cursor.getString(5)));
+                    getCoverByPath(getBluredImages, coversFolder, coversResizeRatio, getIcons, iconsSize, coversSize, item.getString("path"), Long.parseLong(item.getString("id")), item);
                     jsonArray.pushMap(item);
                 } while (cursor.moveToNext());
             } else {
@@ -594,6 +600,7 @@ public class RNAndroidStore extends ReactContextBaseJavaModule {
             if (musicCursor.getCount() > 0) {
                 WritableArray jsonArray = new WritableNativeArray();
                 WritableMap items;
+                int cpt = 0;
 
                 // FFmpegMediaMetadataRetriever mmr = new FFmpegMediaMetadataRetriever();
                 MediaMetadataRetriever mmr = new MediaMetadataRetriever();
@@ -681,6 +688,7 @@ public class RNAndroidStore extends ReactContextBaseJavaModule {
                                 }
 
                                 jsonArray.pushMap(items);
+                                cpt++;
 
                                 if (songsPerIteration > 0) {
 
@@ -692,11 +700,12 @@ public class RNAndroidStore extends ReactContextBaseJavaModule {
                                             sendEvent(reactContext, "onLastBatchReceived", null);
                                         }
                                     } else {
-                                        if (songsPerIteration == jsonArray.size()) {
+                                        if (songsPerIteration == cpt) {
                                             WritableMap params = Arguments.createMap();
                                             params.putArray("batch", jsonArray);
                                             sendEvent(reactContext, "onBatchReceived", params);
                                             jsonArray = new WritableNativeArray();
+                                            cpt = 0;
                                         } else if (pointer == (musicCursor.getCount() - 1)) {
                                             WritableMap params = Arguments.createMap();
                                             params.putArray("batch", jsonArray);
